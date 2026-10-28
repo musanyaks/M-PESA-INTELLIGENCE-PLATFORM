@@ -82,7 +82,7 @@ export default function LoginPage() {
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-ink lg:flex-row">
       {/* left: narrative */}
-      <div className="relative flex flex-1 flex-col justify-between border-b border-line px-6 py-8 lg:border-b-0 lg:border-r lg:px-14 lg:py-12">
+      <div className="relative order-2 flex flex-1 flex-col justify-between border-t border-line px-5 py-8 lg:order-1 lg:border-t-0 lg:border-r lg:px-14 lg:py-12">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.5]"
           style={{
@@ -103,7 +103,7 @@ export default function LoginPage() {
         </div>
 
         <div className="relative my-10 max-w-xl">
-          <h1 className="font-display text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] text-chalk sm:text-[38px]">
+          <h1 className="font-display text-[24px] font-semibold leading-[1.18] tracking-[-0.01em] text-chalk sm:text-[32px] lg:text-[38px]">
             Event streaming, lakehouse engineering and ensemble machine learning —{" "}
             <span className="text-signal">operationalised</span> for a mobile money ecosystem.
           </h1>
@@ -113,7 +113,7 @@ export default function LoginPage() {
             occlusion-based attribution for every decision.
           </p>
 
-          <div className="mt-7 grid grid-cols-2 gap-px overflow-hidden rounded-[3px] border border-line bg-line/60 sm:grid-cols-4">
+          <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-[3px] border border-line bg-line/60 sm:grid-cols-4 lg:mt-7">
             {[
               { k: "detectors", v: "6 ML + rules" },
               { k: "features", v: "18 engineered" },
@@ -140,7 +140,7 @@ export default function LoginPage() {
       </div>
 
       {/* right: auth */}
-      <div className="flex w-full flex-col justify-center bg-ink-2/60 px-6 py-10 lg:w-[460px] lg:px-10">
+      <div className="order-1 flex w-full flex-col justify-center bg-ink-2/60 px-5 py-8 lg:order-2 lg:w-[460px] lg:px-10">
         <div className="mx-auto w-full max-w-[340px]">
           <div className="label-xs mb-2">secure access</div>
           <h2 className="font-display text-[22px] font-semibold text-chalk">Authenticate</h2>

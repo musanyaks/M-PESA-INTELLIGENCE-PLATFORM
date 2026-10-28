@@ -9,6 +9,13 @@ import { TXN_LABEL, compactKsh } from "./core";
 
 type Row = Record<string, unknown>;
 
+/** Postgres resolves untyped bind parameters from the target column, so every
+ *  value bound against an integer column must already be an integer. */
+function int(n: unknown, fallback = 0): number {
+  const v = Number(n);
+  return Number.isFinite(v) ? Math.trunc(v) : fallback;
+}
+
 async function q<T = Row>(query: ReturnType<typeof sql>): Promise<T[]> {
   await ensureReady();
   const res = (await db.execute(query)) as unknown as { rows: T[] };
@@ -25,6 +32,7 @@ export { TWIN_SCALE };
 /* ------------------------------ overview -------------------------- */
 
 export async function getOverview(days = 30) {
+  days = int(days, 30);
   const rows = await q<{
     txn_count: string; txn_value: string; fees: string; customers: string; merchants: string;
     avg_ticket: string; failed: string; reversals: string; flagged: string; critical: string; fraud_value: string;
@@ -109,6 +117,7 @@ export async function getOverview(days = 30) {
 /* ------------------------------ series ---------------------------- */
 
 export async function getVolumeSeries(days = 90) {
+  days = int(days, 90);
   return q<{ day: string; count: string; value: string; fees: string; avg_ticket: string; flagged: string; fraud: string; customers: string }>(sql`
     SELECT day, txn_count::text AS count, txn_value::text AS value, fees::text AS fees,
            avg_ticket::text AS avg_ticket, flagged_count::text AS flagged, fraud_count::text AS fraud,
@@ -120,6 +129,7 @@ export async function getVolumeSeries(days = 90) {
 }
 
 export async function getTypeBreakdown(days = 30) {
+  days = int(days, 30);
   const rows = await q<{ type: string; count: string; value: string; avg_amount: string; risk: string }>(sql`
     SELECT type, count(*)::text AS count, sum(amount)::text AS value,
            round(avg(amount))::text AS avg_amount, round(avg(risk_score))::text AS risk
@@ -134,6 +144,7 @@ export async function getTypeBreakdown(days = 30) {
 }
 
 export async function getChannelMix(days = 30) {
+  days = int(days, 30);
   const rows = await q<{ channel: string; count: string; value: string; risk: string }>(sql`
     SELECT channel, count(*)::text AS count, sum(amount)::text AS value, round(avg(risk_score))::text AS risk
     FROM transactions WHERE occurred_at >= now() - make_interval(days => ${days})
@@ -143,6 +154,7 @@ export async function getChannelMix(days = 30) {
 }
 
 export async function getHourProfile(days = 30) {
+  days = int(days, 30);
   const rows = await q<{ hour: string; count: string; value: string; risk: string }>(sql`
     SELECT extract(hour from occurred_at)::int::text AS hour, count(*)::text AS count,
            sum(amount)::text AS value, round(avg(risk_score))::text AS risk
@@ -153,6 +165,7 @@ export async function getHourProfile(days = 30) {
 }
 
 export async function getCountyBreakdown(days = 30) {
+  days = int(days, 30);
   const rows = await q<{ county: string; count: string; value: string; risk: string; customers: string; merchants: string; flagged: string }>(sql`
     SELECT county, count(*)::text AS count, sum(amount)::text AS value,
            round(avg(risk_score))::text AS risk,
@@ -170,6 +183,7 @@ export async function getCountyBreakdown(days = 30) {
 }
 
 export async function getFraudTrend(days = 60) {
+  days = int(days, 60);
   return q<{ day: string; flagged: string; critical: string; value: string; cases: string }>(sql`
     SELECT day, flagged_count::text AS flagged, fraud_count::text AS critical,
            fraud_value::text AS value, '0'::text AS cases
@@ -186,8 +200,8 @@ export async function getFraudQueue(f: FraudQueueFilters = {}) {
   const level = f.level && f.level !== "ALL" ? f.level : null;
   const status = f.status && f.status !== "ALL" ? f.status : null;
   const county = f.county && f.county !== "ALL" ? f.county : null;
-  const limit = Math.min(f.limit ?? 60, 400);
-  const minScore = f.minScore ?? 0;
+  const limit = Math.min(int(f.limit ?? 60, 60), 400);
+  const minScore = int(f.minScore ?? 0, 0);
   return q<{
     id: string; case_code: string; transaction_code: string; customer_code: string; customer_name: string;
     merchant_name: string | null; county: string | null; type: string | null; amount: number; risk_score: number;
@@ -222,7 +236,8 @@ export async function getFraudCase(id: string) {
   const similar = await q<{ count: string; avg_amount: string; flagged: string }>(sql`
     SELECT count(*)::text AS count, round(avg(amount))::text AS avg_amount,
            count(*) filter (where flagged = 1)::text AS flagged
-    FROM transactions WHERE type = ${c.type} AND county = ${c.county} AND amount BETWEEN ${Math.max(1, c.amount * 0.5)} AND ${c.amount * 2}
+    FROM transactions WHERE type = ${c.type} AND county = ${c.county}
+      AND amount BETWEEN ${Math.max(1, Math.round(c.amount * 0.5))} AND ${Math.round(c.amount * 2)}
   `);
   return { case: c, transaction: txn[0] ?? null, customer: cust[0] ?? null, history, cohort: similar[0] ?? null };
 }
@@ -248,7 +263,7 @@ export async function getFraudSummary() {
 /* ---------------------------- customers --------------------------- */
 
 export async function getCustomerList(opts: { search?: string; segment?: string; sort?: string; limit?: number; risk?: string } = {}) {
-  const limit = Math.min(opts.limit ?? 60, 400);
+  const limit = Math.min(int(opts.limit ?? 60, 60), 400);
   const search = opts.search?.trim() ? `%${opts.search.trim()}%` : null;
   const sortMap: Record<string, string> = {
     value: "value_30d DESC", txn: "txn_30d DESC", risk: "risk_score DESC", churn: "churn_probability DESC",
@@ -319,7 +334,7 @@ export async function getCustomer360(id: string) {
 /* ---------------------------- merchants --------------------------- */
 
 export async function getMerchantList(opts: { category?: string; county?: string; sort?: string; limit?: number } = {}) {
-  const limit = Math.min(opts.limit ?? 60, 300);
+  const limit = Math.min(int(opts.limit ?? 60, 60), 300);
   const sortMap: Record<string, string> = {
     revenue: "revenue_30d DESC", growth: "growth_pct DESC", customers: "unique_customers DESC", risk: "fraud_risk DESC",
   };
@@ -379,6 +394,7 @@ export async function getSegments() {
 /* ----------------------------- cash flow -------------------------- */
 
 export async function getCashFlowAggregate(days = 90) {
+  days = int(days, 90);
   const rows = await q<{ month: string; income: string; expenses: string; fees: string; n: string }>(sql`
     SELECT to_char(date_trunc('month', occurred_at), 'YYYY-MM') AS month,
       coalesce(sum(amount) filter (where type in ('RECEIVE_MONEY','DEPOSIT','REVERSAL')),0)::text AS income,
@@ -501,7 +517,7 @@ export async function getPipeline() {
 /* ------------------------------ alerts ---------------------------- */
 
 export async function getAlerts(opts: { severity?: string; status?: string; limit?: number } = {}) {
-  const limit = Math.min(opts.limit ?? 80, 400);
+  const limit = Math.min(int(opts.limit ?? 80, 80), 400);
   return q<{
     id: string; code: string; severity: string; channel: string; title: string; body: string; rule: string;
     transaction_code: string | null; customer_code: string | null; county: string | null; amount: number;
@@ -543,11 +559,12 @@ export async function getRecentTransactions(limit = 25) {
 
 export async function getTopTransactions(opts: { days?: number; type?: string; limit?: number } = {}) {
   await ensureReady();
-  const limit = Math.min(opts.limit ?? 20, 100);
+  const limit = Math.min(int(opts.limit ?? 20, 20), 100);
+  const winDays = int(opts.days ?? 30, 30);
   return db
     .select()
     .from(transactions)
-    .where(and(gte(transactions.occurredAt, sql`now() - make_interval(days => ${opts.days ?? 30})`), opts.type && opts.type !== "ALL" ? eq(transactions.type, opts.type) : undefined))
+    .where(and(gte(transactions.occurredAt, sql`now() - make_interval(days => ${winDays})`), opts.type && opts.type !== "ALL" ? eq(transactions.type, opts.type) : undefined))
     .orderBy(desc(transactions.amount))
     .limit(limit);
 }

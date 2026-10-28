@@ -46,16 +46,16 @@ export function Icon({ name, className = "h-4 w-4" }: { name: keyof typeof PATHS
 /* ------------------------------ panels ---------------------------- */
 
 export function Panel({
-  title, subtitle, right, children, className = "", bodyClass = "p-4", icon, accent = "#2fd07a",
+  title, subtitle, right, children, className = "", bodyClass = "p-3 sm:p-4", icon, accent = "#2fd07a",
 }: {
   title?: ReactNode; subtitle?: ReactNode; right?: ReactNode; children: ReactNode;
   className?: string; bodyClass?: string; icon?: string; accent?: string;
 }) {
   return (
-    <section className={`panel flex flex-col ${className}`}>
+    <section className={`panel flex min-w-0 flex-col ${className}`}>
       {(title || right) && (
         <header className="panel-head">
-          <div className="flex items-start gap-2.5 min-w-0">
+          <div className="flex min-w-0 flex-[1_1_180px] items-start gap-2.5">
             {icon && (
               <span className="mt-0.5 shrink-0" style={{ color: accent }}>
                 <Icon name={icon} className="h-4 w-4" />
@@ -66,7 +66,11 @@ export function Panel({
               {subtitle && <p className="label-xs mt-0.5 truncate">{subtitle}</p>}
             </div>
           </div>
-          {right && <div className="shrink-0 flex items-center gap-2">{right}</div>}
+          {right && (
+            <div className="touch-scroll no-scrollbar flex max-w-full shrink-0 items-center gap-2 overflow-x-auto">
+              {right}
+            </div>
+          )}
         </header>
       )}
       <div className={bodyClass}>{children}</div>
@@ -141,7 +145,7 @@ export function KPI({
         </span>
       </div>
       <div className="mt-2.5 flex items-end gap-2">
-        <span className="num font-display text-[28px] leading-none font-semibold text-chalk">{value}</span>
+        <span className="num font-display text-[23px] leading-none font-semibold text-chalk sm:text-[28px]">{value}</span>
         {delta !== undefined && <span className="mb-0.5"><Delta value={delta} invert={label.toLowerCase().includes("fraud")} /></span>}
       </div>
       {projected && (
@@ -206,8 +210,8 @@ export function Table({
   head, children, className = "",
 }: { head: ReactNode[]; children: ReactNode; className?: string }) {
   return (
-    <div className={`overflow-x-auto ${className}`}>
-      <table className="w-full border-collapse text-[12px]">
+    <div className={`touch-scroll no-scrollbar overflow-x-auto ${className}`}>
+      <table className="w-full min-w-max border-collapse text-[12px]">
         <thead>
           <tr className="border-b border-line">
             {head.map((h, i) => (

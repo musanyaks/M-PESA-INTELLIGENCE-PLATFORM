@@ -255,10 +255,10 @@ export default async function GeographicIntelligence({ searchParams }: { searchP
                         selected === r.county ? "border-signal/45 bg-signal/[0.07]" : "border-transparent hover:border-line hover:bg-white/[0.03]"
                       }`}
                     >
-                      <div className="flex items-center gap-2.5">
+                      <div className="flex items-center gap-2 sm:gap-2.5">
                         <span className="num w-4 shrink-0 text-[10px] text-fog/60">{String(i + 1).padStart(2, "0")}</span>
-                        <span className="w-[104px] shrink-0 truncate text-[12px] text-chalk">{r.county}</span>
-                        <span className="relative h-[8px] flex-1 overflow-hidden rounded-[2px] bg-white/[0.04]">
+                        <span className="w-[82px] shrink-0 truncate text-[11.5px] text-chalk sm:w-[104px] sm:text-[12px]">{r.county}</span>
+                        <span className="relative h-[8px] min-w-[36px] flex-1 overflow-hidden rounded-[2px] bg-white/[0.04]">
                           <span
                             className="absolute inset-y-0 left-0 rounded-[2px]"
                             style={{
@@ -267,10 +267,10 @@ export default async function GeographicIntelligence({ searchParams }: { searchP
                             }}
                           />
                         </span>
-                        <span className="num w-[92px] shrink-0 text-right text-[11.5px] text-chalk">{fmtMetric(v)}</span>
-                        <span className="num w-12 shrink-0 text-right text-[10px] text-signal/80">{share.toFixed(1)}%</span>
+                        <span className="num w-[78px] shrink-0 text-right text-[11px] text-chalk sm:w-[92px] sm:text-[11.5px]">{fmtMetric(v)}</span>
+                        <span className="num hidden w-12 shrink-0 text-right text-[10px] text-signal/80 sm:block">{share.toFixed(1)}%</span>
                       </div>
-                      <div className="mt-1 flex items-center gap-3 pl-[126px] font-mono text-[9.5px] text-fog/60">
+                      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 pl-6 font-mono text-[9.5px] text-fog/60 sm:pl-[126px]">
                         <span>{compactNum(r.count)} txn</span>
                         <span>{compactKsh(r.value)}</span>
                         <span>risk {r.risk}</span>

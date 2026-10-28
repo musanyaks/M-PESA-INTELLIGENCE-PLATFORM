@@ -42,7 +42,7 @@ export default async function PipelinePage() {
       <div className="space-y-4">
         {/* ---------------------------- architecture ---------------------------- */}
         <Panel title="Reference architecture" subtitle="ingestion → streaming → lakehouse → warehouse → intelligence" icon="layers" accent="#46c8dc">
-          <div className="overflow-x-auto">
+          <div className="touch-scroll no-scrollbar overflow-x-auto">
             <svg viewBox="0 0 1120 330" className="h-[330px] w-full min-w-[1000px]">
               <defs>
                 <marker id="parr" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
@@ -237,14 +237,14 @@ export default async function PipelinePage() {
             ) : (
               <div className="space-y-1.5">
                 {(bootstrap.stages ?? []).map((s, i) => (
-                  <div key={s.name} className="flex items-center gap-3">
-                    <span className="num w-5 shrink-0 text-[10px] text-fog/60">{String(i + 1).padStart(2, "0")}</span>
-                    <span className="w-[220px] shrink-0 truncate text-[11.5px] text-chalk">{s.label}</span>
-                    <span className="relative h-[6px] flex-1 overflow-hidden rounded-[2px] bg-white/[0.04]">
+                  <div key={s.name} className="flex items-center gap-2 sm:gap-3">
+                    <span className="num w-4 shrink-0 text-[10px] text-fog/60 sm:w-5">{String(i + 1).padStart(2, "0")}</span>
+                    <span className="w-[124px] shrink-0 truncate text-[11px] text-chalk sm:w-[220px] sm:text-[11.5px]">{s.label}</span>
+                    <span className="relative h-[6px] min-w-[24px] flex-1 overflow-hidden rounded-[2px] bg-white/[0.04]">
                       <span className="absolute inset-y-0 left-0 rounded-[2px] bg-gradient-to-r from-signal/40 to-signal" style={{ width: `${(s.durationMs / Math.max(...(bootstrap.stages ?? []).map((x) => x.durationMs), 1)) * 100}%` }} />
                     </span>
-                    <span className="num w-16 shrink-0 text-right text-[10.5px] text-fog">{(s.durationMs / 1000).toFixed(2)}s</span>
-                    <span className="num w-16 shrink-0 text-right text-[10.5px] text-signal/80">{compactNum(s.records)}</span>
+                    <span className="num w-11 shrink-0 text-right text-[10px] text-fog sm:w-16 sm:text-[10.5px]">{(s.durationMs / 1000).toFixed(1)}s</span>
+                    <span className="num hidden w-16 shrink-0 text-right text-[10.5px] text-signal/80 sm:block">{compactNum(s.records)}</span>
                   </div>
                 ))}
               </div>

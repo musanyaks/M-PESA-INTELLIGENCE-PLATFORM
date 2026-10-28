@@ -14,9 +14,10 @@ export const GET = api(
   "read:all",
   async ({ search }) => {
     await ensureReady();
-    const limit = Math.min(Number(search.get("limit") ?? 50), 500);
-    const offset = Number(search.get("offset") ?? 0);
-    const days = Number(search.get("days") ?? 30);
+    const num = (v: string | null, d: number) => { const n = Number(v ?? d); return Number.isFinite(n) ? Math.trunc(n) : d; };
+    const limit = Math.min(num(search.get("limit"), 50), 500);
+    const offset = Math.max(0, num(search.get("offset"), 0));
+    const days = Math.max(1, num(search.get("days"), 30));
     const type = search.get("type");
     const county = search.get("county");
     const customer = search.get("customer_id") ?? search.get("customer");
@@ -33,7 +34,7 @@ export const GET = api(
       merchant ? eq(transactions.merchantId, merchant) : undefined,
       status && status !== "ALL" ? eq(transactions.status, status) : undefined,
       channel && channel !== "ALL" ? eq(transactions.channel, channel) : undefined,
-      minRisk ? sql`${transactions.riskScore} >= ${Number(minRisk)}` : undefined,
+      minRisk ? sql`${transactions.riskScore} >= ${Math.trunc(Number(minRisk)) || 0}` : undefined,
     ].filter(Boolean);
 
     const where = conditions.length ? and(...(conditions as never[])) : undefined;

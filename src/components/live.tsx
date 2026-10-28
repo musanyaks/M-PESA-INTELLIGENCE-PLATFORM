@@ -125,23 +125,26 @@ export function LiveStream({ limit = 14, title = "Live transaction stream", show
         {rows.map((r) => {
           const flagged = r.risk_level === "HIGH" || r.risk_level === "CRITICAL";
           return (
-            <div key={`${r.transaction_id}-${r.offset}`} className="row-enter grid grid-cols-[76px_minmax(0,1fr)_auto] items-center gap-3 px-4 py-[7px] hover:bg-white/[0.025]">
-              <span className="num text-[10px] text-fog/70">{r.transaction_id.slice(-6)}</span>
-              <div className="flex min-w-0 items-center gap-2.5">
-                <span className="w-[92px] shrink-0 font-mono text-[10px] uppercase tracking-[0.08em] text-cyan/90">
-                  {TXN_LABEL[r.transaction_type] ?? r.transaction_type}
+            <div
+              key={`${r.transaction_id}-${r.offset}`}
+              className="row-enter flex flex-wrap items-center gap-x-2.5 gap-y-1 border-b border-line/40 px-3 py-2 last:border-0 hover:bg-white/[0.025] sm:px-4 sm:py-[7px]"
+            >
+              <span className="num shrink-0 text-[10px] text-fog/60">{r.transaction_id.slice(-6)}</span>
+              <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.08em] text-cyan/90">
+                {TXN_LABEL[r.transaction_type] ?? r.transaction_type}
+              </span>
+              <span className="num shrink-0 text-[12px] text-chalk">KSh {r.amount.toLocaleString()}</span>
+              <span className="shrink-0 text-[11px] text-fog">{r.location}</span>
+              <span className="hidden min-w-0 flex-1 truncate text-[10.5px] text-fog/70 md:block">
+                {r.merchant ?? r.customer_id}
+              </span>
+              {flagged && (
+                <span className="flex w-full items-center gap-1 font-mono text-[9.5px] uppercase tracking-[0.1em] text-amber lg:w-auto lg:flex-none">
+                  <Icon name="warning" className="h-3 w-3 shrink-0" />
+                  <span className="truncate">{r.reasons.slice(0, 2).join(" · ") || "ensemble signal"}</span>
                 </span>
-                <span className="num w-[86px] shrink-0 text-[12px] text-chalk">KSh {r.amount.toLocaleString()}</span>
-                <span className="hidden w-[74px] shrink-0 truncate text-[11px] text-fog sm:block">{r.location}</span>
-                <span className="hidden truncate text-[10.5px] text-fog/70 md:block">{r.merchant ?? r.customer_id}</span>
-                {flagged && (
-                  <span className="hidden shrink-0 items-center gap-1 font-mono text-[9.5px] uppercase tracking-[0.1em] text-amber lg:flex">
-                    <Icon name="warning" className="h-3 w-3" />
-                    {r.reasons.slice(0, 2).join(" · ") || "ensemble signal"}
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-2.5">
+              )}
+              <span className="ml-auto flex shrink-0 items-center gap-2.5">
                 <span className="num hidden text-[9.5px] text-fog/50 sm:block">p{r.partition}·o{r.offset}</span>
                 <span className="num hidden text-[9.5px] text-fog/50 md:block">{r.inference_ms.toFixed(1)}ms</span>
                 {flagged ? (
@@ -153,7 +156,7 @@ export function LiveStream({ limit = 14, title = "Live transaction stream", show
                     <Icon name="check" className="h-3 w-3" /> OK
                   </span>
                 )}
-              </div>
+              </span>
             </div>
           );
         })}

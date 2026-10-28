@@ -77,7 +77,7 @@ export default async function AlertsPage({ searchParams }: { searchParams: Promi
 
         {/* -------------------------- alert architecture ------------------------- */}
         <Panel title="Alert architecture" subtitle="event-driven fan-out with per-channel delivery policy" icon="bolt" accent="#f5a524">
-          <div className="overflow-x-auto">
+          <div className="touch-scroll no-scrollbar overflow-x-auto">
             <svg viewBox="0 0 1080 168" className="h-[168px] w-full min-w-[900px]">
               <defs>
                 <marker id="arr" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
@@ -171,7 +171,9 @@ export default async function AlertsPage({ searchParams }: { searchParams: Promi
                       <span className="font-mono text-[10px] uppercase tracking-[0.12em]" style={{ color: RISK_COLOUR[s.key] ?? "#8fa3a8" }}>{s.key}</span>
                       <span className="num text-[11px] text-chalk">{s.count.toLocaleString()} · {((s.count / total) * 100).toFixed(1)}%</span>
                     </div>
-                    <HBar label="" value={s.count} max={total} tone={RISK_COLOUR[s.key] ?? "#8fa3a8"} right="" />
+                    <div className="h-[3px] overflow-hidden rounded-full bg-white/[0.05]">
+                      <div className="h-full rounded-full" style={{ width: `${Math.min(100, (s.count / total) * 100)}%`, background: RISK_COLOUR[s.key] ?? "#8fa3a8" }} />
+                    </div>
                   </div>
                 ))}
               </div>

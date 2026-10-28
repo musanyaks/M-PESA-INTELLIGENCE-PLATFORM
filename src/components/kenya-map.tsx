@@ -84,6 +84,8 @@ export function KenyaMap({
 }) {
   const router = useRouter();
   const wrap = useRef<HTMLDivElement | null>(null);
+  const svg = useRef<SVGSVGElement | null>(null);
+  const pointer = useRef<"mouse" | "touch" | "pen">("mouse");
   const [hover, setHover] = useState<{ name: string; x: number; y: number } | null>(null);
   const [labels, setLabels] = useState(true);
 
@@ -119,6 +121,14 @@ export function KenyaMap({
 
   const fmt = (v: number) => (metric === "value" ? compactKsh(v) : metric === "risk" ? `${Math.round(v)}/100` : compactNum(v));
 
+  const centroidPos = (name: string, c: [number, number]) => {
+    const box = wrap.current?.getBoundingClientRect();
+    const rect = svg.current?.getBoundingClientRect();
+    if (!box || !rect) return { name, x: c[0], y: c[1] };
+    const scale = rect.width / W;
+    return { name, x: rect.left - box.left + c[0] * scale, y: rect.top - box.top + c[1] * scale };
+  };
+
   const move = (e: React.MouseEvent, name: string) => {
     const box = wrap.current?.getBoundingClientRect();
     if (!box) return;
@@ -145,8 +155,9 @@ export function KenyaMap({
       </div>
 
       <svg
+        ref={svg}
         viewBox={`0 0 ${W} ${H}`}
-        className="mx-auto block h-auto w-full max-w-[560px] select-none"
+        className="mx-auto block h-auto w-full max-w-[560px] touch-manipulation select-none"
         onMouseLeave={() => setHover(null)}
         role="img"
         aria-label={`Kenya county choropleth of ${METRIC_LABEL[metric]}`}
@@ -186,11 +197,23 @@ export function KenyaMap({
                 tabIndex={0}
                 role="button"
                 aria-label={`${p.name}: ${METRIC_LABEL[metric]} ${fmt(v)}`}
+                onPointerDown={(e) => {
+                  pointer.current = e.pointerType as "mouse" | "touch" | "pen";
+                }}
                 onMouseMove={(e) => move(e, p.name)}
                 onMouseEnter={(e) => move(e, p.name)}
-                onFocus={() => setHover({ name: p.name, x: p.centroid[0], y: p.centroid[1] })}
+                onFocus={() => setHover(centroidPos(p.name, p.centroid))}
                 onBlur={() => setHover(null)}
-                onClick={() => router.push(`/geo?metric=${metric}&county=${encodeURIComponent(p.name)}`)}
+                onClick={() => {
+                  const url = `/geo?metric=${metric}&county=${encodeURIComponent(p.name)}`;
+                  // touch has no hover: first tap pins the dossier, second tap drills down
+                  if (pointer.current !== "mouse") {
+                    if (hover?.name === p.name) router.push(url);
+                    else setHover(centroidPos(p.name, p.centroid));
+                    return;
+                  }
+                  router.push(url);
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
@@ -277,7 +300,7 @@ export function KenyaMap({
             </span>
           </div>
           <div className="mt-2 border-t border-line pt-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-cyan/80">
-            click to drill down
+            tap again to drill down
           </div>
         </div>
       )}

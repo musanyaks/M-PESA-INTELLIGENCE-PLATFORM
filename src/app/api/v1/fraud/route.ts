@@ -20,7 +20,7 @@ export const GET = api(
       minScore,
       status: search.get("status") ?? undefined,
       county: search.get("county") ?? undefined,
-      limit: Number(search.get("limit") ?? 40),
+      limit: Math.trunc(Number(search.get("limit") ?? 40)) || 40,
     });
     const summary = await getFraudSummary();
     const models = await db.select().from(mlModels);

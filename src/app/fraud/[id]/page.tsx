@@ -53,7 +53,7 @@ export default async function FraudInvestigation({ params }: { params: Promise<{
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-[300px_1fr]">
           <Panel title="Verdict" icon="shield" accent={recTone} bodyClass="p-4">
             <div className="flex flex-col items-center">
-              <RiskGauge score={c.riskScore} size={176} />
+              <RiskGauge score={c.riskScore} size={156} />
               <div className="mt-2"><RiskTag level={c.riskLevel} /></div>
               <div className="mt-4 w-full rounded-[3px] border px-3 py-2.5 text-center" style={{ borderColor: `${recTone}55`, background: `${recTone}12` }}>
                 <div className="label-xs">recommendation</div>
@@ -144,9 +144,9 @@ export default async function FraudInvestigation({ params }: { params: Promise<{
             <div className="space-y-2.5">
               {attributions.map((a) => (
                 <div key={a.feature}>
-                  <div className="flex items-baseline gap-3">
-                    <span className="w-[240px] shrink-0 truncate text-[12px] text-chalk">{a.label}</span>
-                    <span className="relative h-[18px] flex-1 overflow-hidden rounded-[2px] bg-white/[0.03]">
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5 sm:flex-nowrap">
+                    <span className="min-w-0 flex-1 truncate text-[12px] text-chalk sm:w-[240px] sm:flex-none">{a.label}</span>
+                    <span className="relative h-[18px] w-full overflow-hidden rounded-[2px] bg-white/[0.03] sm:w-auto sm:flex-1">
                       <span className="absolute inset-y-0 left-1/2 w-px bg-line-2" />
                       <span
                         className="absolute inset-y-0 rounded-[2px]"
@@ -157,9 +157,9 @@ export default async function FraudInvestigation({ params }: { params: Promise<{
                         }}
                       />
                     </span>
-                    <span className="num w-14 shrink-0 text-right text-[12px] text-chalk">{a.share.toFixed(1)}%</span>
+                    <span className="num ml-auto shrink-0 text-right text-[12px] text-chalk sm:ml-0 sm:w-14">{a.share.toFixed(1)}%</span>
                   </div>
-                  <div className="mt-1 flex items-center gap-2 pl-[252px]">
+                  <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 sm:pl-[252px]">
                     <span className="font-mono text-[9.5px] uppercase tracking-[0.12em]" style={{ color: a.contribution >= 0 ? "#ff5a5f" : "#2fd07a" }}>
                       {a.direction}
                     </span>
