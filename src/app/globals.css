@@ -1,0 +1,191 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #070a0b;
+  --color-ink-2: #0b1113;
+  --color-panel: #0e1517;
+  --color-panel-2: #121b1e;
+  --color-panel-3: #16211f;
+  --color-line: #1e2b2f;
+  --color-line-2: #2a3b40;
+  --color-fog: #8fa3a8;
+  --color-chalk: #e8f0f1;
+  --color-signal: #2fd07a;
+  --color-signal-dim: #17603c;
+  --color-amber: #f5a524;
+  --color-alert: #ff5a5f;
+  --color-cyan: #46c8dc;
+  --color-iris: #9d8cff;
+
+  --font-display: var(--font-space), "Space Grotesk", ui-sans-serif, sans-serif;
+  --font-sans: var(--font-plex), "IBM Plex Sans", ui-sans-serif, sans-serif;
+  --font-mono: var(--font-mono-plex), "IBM Plex Mono", ui-monospace, monospace;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: var(--color-ink);
+  color: var(--color-chalk);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-image:
+    radial-gradient(1200px 600px at 82% -12%, rgba(47, 208, 122, 0.09), transparent 62%),
+    radial-gradient(900px 520px at 4% 4%, rgba(70, 200, 220, 0.07), transparent 58%),
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: auto, auto, 44px 44px, 44px 44px;
+  background-attachment: fixed;
+}
+
+::selection {
+  background: rgba(47, 208, 122, 0.28);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #26383d transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #26383d;
+  border-radius: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@utility panel {
+  background: linear-gradient(180deg, rgba(18, 27, 30, 0.92), rgba(11, 17, 19, 0.92));
+  border: 1px solid var(--color-line);
+  border-radius: 4px;
+  position: relative;
+}
+
+@utility panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-line);
+  background: linear-gradient(180deg, rgba(47, 208, 122, 0.045), transparent);
+}
+
+@utility label-xs {
+  font-family: var(--font-mono-plex), monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-fog);
+}
+
+@utility num {
+  font-family: var(--font-mono-plex), monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+@utility hairline {
+  border-color: var(--color-line);
+}
+
+@utility corner-marks {
+  background-image:
+    linear-gradient(var(--color-signal), var(--color-signal)),
+    linear-gradient(var(--color-signal), var(--color-signal)),
+    linear-gradient(var(--color-signal), var(--color-signal)),
+    linear-gradient(var(--color-signal), var(--color-signal));
+  background-size: 10px 1px, 1px 10px, 10px 1px, 1px 10px;
+  background-position: 0 0, 0 0, 100% 100%, 100% 100%;
+  background-repeat: no-repeat;
+}
+
+@utility scan {
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(47, 208, 122, 0.5); }
+  70% { box-shadow: 0 0 0 7px rgba(47, 208, 122, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(47, 208, 122, 0); }
+}
+.pulse-dot {
+  animation: pulse-ring 2s infinite;
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.row-enter {
+  animation: slide-in 0.35s ease-out;
+}
+
+@keyframes sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(320%); }
+}
+.sweep::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 30%;
+  background: linear-gradient(90deg, transparent, rgba(47, 208, 122, 0.16), transparent);
+  animation: sweep 2.6s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+.blink {
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+@keyframes dash {
+  to { stroke-dashoffset: -24; }
+}
+.flow-dash {
+  stroke-dasharray: 5 7;
+  animation: dash 1.1s linear infinite;
+}
+
+.recharts-surface {
+  overflow: visible;
+}
+.recharts-cartesian-axis-tick text {
+  font-family: var(--font-mono-plex), monospace;
+  font-size: 10px;
+  fill: #7d9298;
+}
+.recharts-text {
+  fill: #7d9298;
+  font-size: 10px;
+}
+.recharts-default-tooltip {
+  border-radius: 3px !important;
+}
+.recharts-polar-angle-axis-tick-value {
+  font-size: 10px;
+  fill: #8fa3a8;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 1px solid var(--color-signal);
+  outline-offset: 2px;
+}
